@@ -4,15 +4,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: backend
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes:
       - back_static:/app/back_static
       - back_media:/app/back_media
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - back_static:/var/www/back_static:ro
+      - back_media:/var/www/back_media:ro
+    depends_on:
+      - backend
 
 volumes:
   back_static:
